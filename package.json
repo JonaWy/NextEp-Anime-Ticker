@@ -1,0 +1,26 @@
+{
+  "name": "anitick",
+  "version": "1.0.0",
+  "description": "Anime Release Tracker Chrome Extension",
+  "scripts": {
+    "test": "echo \"No tests yet\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json,css,html}\"",
+    "format:check": "prettier --check \"**/*.{js,json,css,html}\""
+  },
+  "keywords": [
+    "chrome-extension",
+    "anime",
+    "tracker",
+    "anilist",
+    "anitick"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "prettier": "^3.7.4",
+    "shadcn": "^3.6.3"
+  }
+}
