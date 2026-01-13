@@ -1,127 +1,205 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AniTick</title>
-  <link rel="stylesheet" href="popup.css">
-</head>
-<body>
-  <div class="app" id="app">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-title">
-        <h1>AniTick</h1>
-      </div>
-      <div class="header-actions">
-        <button class="icon-btn" id="searchToggle" aria-label="Anime suchen">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-        </button>
-        <button class="icon-btn" id="settingsToggle" aria-label="Einstellungen">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </button>
-      </div>
-    </header>
-
-    <!-- Search Section (Collapsible) -->
-    <section class="search-section hidden" id="searchSection">
-      <div class="search-container">
-        <input 
-          type="text" 
-          class="search-input" 
-          id="searchInput" 
-          placeholder="Anime suchen..."
-          aria-label="Anime suchen"
-        >
-        <div class="search-results" id="searchResults"></div>
-      </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Loading State -->
-      <div class="loading hidden" id="loading">
-        <div class="spinner"></div>
-        <span>Lade...</span>
-      </div>
-
-      <!-- Empty State -->
-      <div class="empty-state hidden" id="emptyState">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
-        </svg>
-        <h2>Keine Anime in der Watchlist</h2>
-        <p>Klicke auf die Suche um Anime hinzuzufügen</p>
-      </div>
-
-      <!-- Anime List -->
-      <div class="anime-list" id="animeList"></div>
-    </main>
-
-    <!-- Settings Modal -->
-    <div class="modal hidden" id="settingsModal">
-      <div class="modal-backdrop" id="settingsBackdrop"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Einstellungen</h2>
-          <button class="icon-btn" id="closeSettings" aria-label="Schließen">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 6 6 18"></path>
-              <path d="m6 6 12 12"></path>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AniTick</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-title">
+          <h1>AniTick</h1>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="searchToggle" aria-label="Anime suchen">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </button>
+          <button
+            class="icon-btn"
+            id="settingsToggle"
+            aria-label="Einstellungen"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+              ></path>
+              <circle cx="12" cy="12" r="3"></circle>
             </svg>
           </button>
         </div>
-        <div class="modal-body">
-          <!-- Notifications Section -->
-          <div class="settings-section">
-            <h3>Benachrichtigungen</h3>
-            <div class="setting-item">
-              <label for="notificationsEnabled">Benachrichtigungen aktiviert</label>
-              <input type="checkbox" id="notificationsEnabled" class="toggle">
-            </div>
-          </div>
+      </header>
 
-          <!-- Display Section -->
-          <div class="settings-section">
-            <h3>Anzeige</h3>
-            <div class="setting-item">
-              <label for="themeSelect">Theme</label>
-              <select id="themeSelect" class="select">
-                <option value="dark">Dunkel</option>
-                <option value="light">Hell</option>
-                <option value="auto">Automatisch</option>
-              </select>
-            </div>
-            <div class="setting-item">
-              <label for="sortSelect">Sortieren nach</label>
-              <select id="sortSelect" class="select">
-                <option value="nextEpisode">Nächste Folge</option>
-                <option value="title">Titel</option>
-                <option value="dateAdded">Hinzugefügt am</option>
-              </select>
-            </div>
-          </div>
+      <!-- Search Section (Collapsible) -->
+      <section class="search-section hidden" id="searchSection">
+        <div class="search-container">
+          <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Anime suchen..."
+            aria-label="Anime suchen"
+          />
+          <div class="search-results" id="searchResults"></div>
+        </div>
+      </section>
 
-          <!-- Data Section -->
-          <div class="settings-section">
-            <h3>Daten</h3>
-            <div class="setting-actions">
-              <button class="btn btn-secondary" id="exportData">Exportieren</button>
-              <button class="btn btn-secondary" id="importData">Importieren</button>
-              <button class="btn btn-destructive" id="clearData">Alle löschen</button>
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Loading State -->
+        <div class="loading hidden" id="loading">
+          <div class="spinner"></div>
+          <span>Lade...</span>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state hidden" id="emptyState">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+            ></path>
+          </svg>
+          <h2>Keine Anime in der Watchlist</h2>
+          <p>Klicke auf die Suche um Anime hinzuzufügen</p>
+        </div>
+
+        <!-- Anime List -->
+        <div class="anime-list" id="animeList"></div>
+      </main>
+
+      <!-- Settings Modal -->
+      <div class="modal hidden" id="settingsModal">
+        <div class="modal-backdrop" id="settingsBackdrop"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Einstellungen</h2>
+            <button class="icon-btn" id="closeSettings" aria-label="Schließen">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 6 6 18"></path>
+                <path d="m6 6 12 12"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- Notifications Section -->
+            <div class="settings-section">
+              <h3>Benachrichtigungen</h3>
+              <div class="setting-item">
+                <label for="notificationsEnabled"
+                  >Benachrichtigungen aktiviert</label
+                >
+                <input
+                  type="checkbox"
+                  id="notificationsEnabled"
+                  class="toggle"
+                />
+              </div>
+            </div>
+
+            <!-- Display Section -->
+            <div class="settings-section">
+              <h3>Anzeige</h3>
+              <div class="setting-item">
+                <label for="themeSelect">Theme</label>
+                <select id="themeSelect" class="select">
+                  <option value="dark">Dunkel</option>
+                  <option value="light">Hell</option>
+                  <option value="auto">Automatisch</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label for="sortSelect">Sortieren nach</label>
+                <select id="sortSelect" class="select">
+                  <option value="nextEpisode">Nächste Folge</option>
+                  <option value="title">Titel</option>
+                  <option value="dateAdded">Hinzugefügt am</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="settings-section">
+              <h3>Suche</h3>
+              <div class="setting-item">
+                <label for="filterLatestSeason"
+                  >Nur neueste Seasons anzeigen</label
+                >
+                <input
+                  type="checkbox"
+                  id="filterLatestSeason"
+                  class="toggle"
+                />
+              </div>
+              <p class="setting-hint">
+                Blendet ältere Seasons aus, wenn eine neuere läuft oder angekündigt ist.
+              </p>
+            </div>
+
+            <!-- Data Section -->
+            <div class="settings-section">
+              <h3>Daten</h3>
+              <div class="setting-actions">
+                <button class="btn btn-secondary" id="exportData">
+                  Exportieren
+                </button>
+                <button class="btn btn-secondary" id="importData">
+                  Importieren
+                </button>
+                <button class="btn btn-destructive" id="clearData">
+                  Alle löschen
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script type="module" src="popup.js"></script>
-</body>
+    <script type="module" src="popup.js"></script>
+  </body>
 </html>

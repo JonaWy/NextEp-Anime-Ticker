@@ -46,13 +46,13 @@ export function throttle(func, limit) {
 export function formatCountdown(timestamp) {
   const now = Math.floor(Date.now() / 1000);
   const diff = timestamp - now;
-  
+
   if (diff <= 0) return null;
-  
+
   const days = Math.floor(diff / 86400);
   const hours = Math.floor((diff % 86400) / 3600);
   const minutes = Math.floor((diff % 3600) / 60);
-  
+
   if (days > 0) {
     return `${days}d ${hours}h`;
   } else if (hours > 0) {
@@ -69,12 +69,12 @@ export function formatCountdown(timestamp) {
  */
 export function formatDate(date) {
   if (!date || !date.year) return 'TBA';
-  
+
   const { year, month, day } = date;
-  
+
   if (!month) return String(year);
   if (!day) return `${getMonthName(month)} ${year}`;
-  
+
   return `${day}. ${getMonthName(month)} ${year}`;
 }
 
@@ -85,9 +85,18 @@ export function formatDate(date) {
  */
 function getMonthName(month) {
   const months = [
-    'Januar', 'Februar', 'März', 'April',
-    'Mai', 'Juni', 'Juli', 'August',
-    'September', 'Oktober', 'November', 'Dezember'
+    'Januar',
+    'Februar',
+    'März',
+    'April',
+    'Mai',
+    'Juni',
+    'Juli',
+    'August',
+    'September',
+    'Oktober',
+    'November',
+    'Dezember',
   ];
   return months[month - 1] || '';
 }
@@ -99,11 +108,11 @@ function getMonthName(month) {
  */
 export function getStatusLabel(status) {
   const labels = {
-    'RELEASING': 'Läuft',
-    'FINISHED': 'Beendet',
-    'NOT_YET_RELEASED': 'Kommend',
-    'CANCELLED': 'Abgebrochen',
-    'HIATUS': 'Pausiert',
+    RELEASING: 'Läuft',
+    FINISHED: 'Beendet',
+    NOT_YET_RELEASED: 'Kommend',
+    CANCELLED: 'Abgebrochen',
+    HIATUS: 'Pausiert',
   };
   return labels[status] || status;
 }
@@ -115,11 +124,11 @@ export function getStatusLabel(status) {
  */
 export function getStatusClass(status) {
   const classes = {
-    'RELEASING': 'airing',
-    'FINISHED': 'finished',
-    'NOT_YET_RELEASED': 'upcoming',
-    'CANCELLED': 'finished',
-    'HIATUS': 'finished',
+    RELEASING: 'airing',
+    FINISHED: 'finished',
+    NOT_YET_RELEASED: 'upcoming',
+    CANCELLED: 'finished',
+    HIATUS: 'finished',
   };
   return classes[status] || 'finished';
 }
@@ -131,7 +140,7 @@ export function getStatusClass(status) {
  */
 export function sanitizeText(html) {
   if (!html) return '';
-  
+
   const div = document.createElement('div');
   div.textContent = html;
   return div.innerHTML;
@@ -175,7 +184,7 @@ export function isEmpty(value) {
  * @returns {Promise<void>}
  */
 export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -187,18 +196,20 @@ export function sleep(ms) {
  */
 export async function retry(fn, maxRetries = 3, baseDelay = 1000) {
   let lastError;
-  
+
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
       const delay = baseDelay * Math.pow(2, i);
-      console.warn(`Retry ${i + 1}/${maxRetries} failed, waiting ${delay}ms...`);
+      console.warn(
+        `Retry ${i + 1}/${maxRetries} failed, waiting ${delay}ms...`
+      );
       await sleep(delay);
     }
   }
-  
+
   throw lastError;
 }
 
@@ -217,4 +228,38 @@ export function groupBy(array, key) {
     result[groupKey].push(item);
     return result;
   }, {});
+}
+
+/**
+ * Check if an anime has a sequel (newer season)
+ * An anime with ANY sequel is considered an older season.
+ * The newest season is the one WITHOUT any sequel.
+ * @param {Object} anime - Anime object with relations
+ * @returns {boolean} - True if anime has a sequel (is an older season)
+ */
+export function hasSequel(anime) {
+  if (!anime?.relations?.edges) return false;
+
+  // Find any SEQUEL relation where the node is an ANIME (not manga/novel)
+  const animeSequels = anime.relations.edges.filter(
+    (edge) =>
+      edge.relationType === 'SEQUEL' &&
+      edge.node?.type !== 'MANGA' &&
+      edge.node?.type !== 'NOVEL'
+  );
+
+  // If there's any anime sequel, this is an older season
+  return animeSequels.length > 0;
+}
+
+/**
+ * Filter anime list to only show the latest season of each series
+ * Removes anime that have any sequel (older seasons)
+ * @param {Array} animeList - Array of anime objects with relations
+ * @returns {Array} - Filtered anime list with only latest seasons
+ */
+export function filterToLatestSeason(animeList) {
+  if (!animeList || !Array.isArray(animeList)) return [];
+
+  return animeList.filter((anime) => !hasSequel(anime));
 }

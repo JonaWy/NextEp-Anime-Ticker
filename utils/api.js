@@ -4,6 +4,7 @@
  */
 
 import { ANILIST_API_URL, CACHE_TTL } from '../config/constants.js';
+import { filterToLatestSeason } from './helpers.js';
 
 /**
  * Rate Limiter Class
@@ -18,14 +19,16 @@ class RateLimiter {
 
   async waitForSlot() {
     const now = Date.now();
-    this.requests = this.requests.filter(time => now - time < this.timeWindow);
-    
+    this.requests = this.requests.filter(
+      (time) => now - time < this.timeWindow
+    );
+
     if (this.requests.length >= this.maxRequests) {
       const oldestRequest = this.requests[0];
       const waitTime = this.timeWindow - (now - oldestRequest);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
-    
+
     this.requests.push(Date.now());
   }
 }
@@ -43,9 +46,11 @@ export class AniListAPI {
   /**
    * Search for anime by query string
    * @param {string} query - Search term
+   * @param {Object} options - Search options
+   * @param {boolean} options.filterLatestSeason - Filter to only show latest seasons (default: true)
    * @returns {Promise<Array>} - Array of anime results
    */
-  async searchAnime(query) {
+  async searchAnime(query, options = { filterLatestSeason: true }) {
     const graphqlQuery = `
       query ($search: String) {
         Page(page: 1, perPage: 10) {
@@ -70,13 +75,35 @@ export class AniListAPI {
             seasonYear
             genres
             averageScore
+            relations {
+              edges {
+                relationType
+                node {
+                  id
+                  type
+                  status
+                  title {
+                    romaji
+                    english
+                  }
+                  seasonYear
+                }
+              }
+            }
           }
         }
       }
     `;
 
     const response = await this.makeRequest(graphqlQuery, { search: query });
-    return response?.data?.Page?.media || [];
+    const allResults = response?.data?.Page?.media || [];
+
+    // Filter to only show latest seasons (anime without active sequels) if enabled
+    if (options.filterLatestSeason) {
+      return filterToLatestSeason(allResults);
+    }
+
+    return allResults;
   }
 
   /**
@@ -153,11 +180,11 @@ export class AniListAPI {
 
     const response = await this.makeRequest(query, { id });
     const data = response?.data?.Media;
-    
+
     if (data) {
       this.cacheResponse(cacheKey, data, CACHE_TTL.ANIME_DETAILS);
     }
-    
+
     return data;
   }
 
@@ -176,7 +203,7 @@ export class AniListAPI {
     }
 
     const results = [];
-    
+
     for (const batch of batches) {
       const query = `
         query ($ids: [Int]) {
@@ -217,7 +244,7 @@ export class AniListAPI {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         body: JSON.stringify({ query, variables }),
       });
@@ -225,7 +252,7 @@ export class AniListAPI {
       if (!response.ok) {
         if (response.status === 429) {
           console.warn('[AniTick API] Rate limit exceeded, waiting...');
-          await new Promise(resolve => setTimeout(resolve, 60000));
+          await new Promise((resolve) => setTimeout(resolve, 60000));
           return this.makeRequest(query, variables);
         }
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -19,6 +19,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "canvas": "^3.2.1",
     "eslint": "^8.57.1",
     "prettier": "^3.7.4",
     "shadcn": "^3.6.3"

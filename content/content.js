@@ -1,7 +1,7 @@
 /**
  * AniTick Content Script
  * Optional: Runs on web pages to enhance anime-related content
- * 
+ *
  * This script is currently a placeholder for future features like:
  * - Automatic detection of anime pages
  * - Integration with streaming sites
@@ -19,7 +19,7 @@ const SUPPORTED_SITES = [
  */
 function init() {
   const currentSite = detectSite();
-  
+
   if (currentSite) {
     console.log(`[AniTick Content] Detected: ${currentSite.name}`);
     // Future: Add quick-add button or other enhancements
@@ -32,7 +32,7 @@ function init() {
  */
 function detectSite() {
   const url = window.location.href;
-  
+
   for (const site of SUPPORTED_SITES) {
     const match = url.match(site.pattern);
     if (match) {
@@ -42,7 +42,7 @@ function detectSite() {
       };
     }
   }
-  
+
   return null;
 }
 
@@ -51,6 +51,7 @@ function detectSite() {
  * @param {Object} message - Message to send
  * @returns {Promise<Object>} - Response
  */
+// eslint-disable-next-line no-unused-vars
 async function sendMessage(message) {
   return new Promise((resolve) => {
     chrome.runtime.sendMessage(message, resolve);

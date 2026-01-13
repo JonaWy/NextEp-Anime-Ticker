@@ -27,7 +27,10 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     console.log('[AniTick] Initial setup completed');
   } else if (details.reason === 'update') {
     // Extension update
-    console.log('[AniTick] Extension updated to version:', chrome.runtime.getManifest().version);
+    console.log(
+      '[AniTick] Extension updated to version:',
+      chrome.runtime.getManifest().version
+    );
   }
 });
 
@@ -150,14 +153,19 @@ async function checkAndSendNotifications() {
  */
 async function handleMessage(message, sender, sendResponse) {
   try {
+    let results, details, watchlist, settings;
+
     switch (message.type) {
       case 'SEARCH_ANIME':
-        const results = await api.searchAnime(message.query);
+        settings = await storage.getSettings();
+        results = await api.searchAnime(message.query, {
+          filterLatestSeason: settings?.search?.filterLatestSeason ?? true,
+        });
         sendResponse({ success: true, data: results });
         break;
 
       case 'GET_ANIME_DETAILS':
-        const details = await api.getAnimeDetails(message.id);
+        details = await api.getAnimeDetails(message.id);
         sendResponse({ success: true, data: details });
         break;
 
@@ -172,7 +180,7 @@ async function handleMessage(message, sender, sendResponse) {
         break;
 
       case 'GET_WATCHLIST':
-        const watchlist = await storage.getWatchlist();
+        watchlist = await storage.getWatchlist();
         sendResponse({ success: true, data: watchlist });
         break;
 
@@ -182,7 +190,7 @@ async function handleMessage(message, sender, sendResponse) {
         break;
 
       case 'GET_SETTINGS':
-        const settings = await storage.getSettings();
+        settings = await storage.getSettings();
         sendResponse({ success: true, data: settings });
         break;
 

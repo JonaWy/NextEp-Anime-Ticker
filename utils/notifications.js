@@ -21,7 +21,7 @@ export class NotificationManager {
    */
   async checkAndNotify() {
     const settings = await this.storage.getSettings();
-    
+
     // Check if notifications are enabled
     if (!settings?.notifications?.enabled) {
       console.log('[Notifications] Notifications are disabled');
@@ -34,10 +34,10 @@ export class NotificationManager {
     }
 
     const now = Date.now() / 1000; // Convert to seconds for comparison with airingAt
-    
+
     for (const anime of watchlist) {
       if (!anime.notificationsEnabled) continue;
-      
+
       const nextEp = anime.nextAiringEpisode;
       if (!nextEp) continue;
 
@@ -68,7 +68,7 @@ export class NotificationManager {
    */
   async sendUpcomingNotification(anime, episode, timeUntil) {
     const notificationKey = `upcoming_${anime.id}_${episode.episode}`;
-    
+
     // Don't spam notifications
     if (this.hasRecentlyNotified(notificationKey)) {
       return;
@@ -97,7 +97,7 @@ export class NotificationManager {
    */
   async sendNewEpisodeNotification(anime, episode) {
     const notificationKey = `release_${anime.id}_${episode.episode}`;
-    
+
     // Don't spam notifications
     if (this.hasRecentlyNotified(notificationKey)) {
       return;
@@ -122,19 +122,23 @@ export class NotificationManager {
    * @param {Object} options - Notification options
    * @returns {Promise<string>} - Notification ID
    */
-  async sendNotification({ id, title, message, iconUrl, data }) {
+  async sendNotification({ id, title, message, iconUrl }) {
     return new Promise((resolve) => {
-      chrome.notifications.create(id, {
-        type: 'basic',
-        iconUrl: iconUrl || 'assets/icons/icon-128.png',
-        title,
-        message,
-        priority: 2,
-        requireInteraction: false,
-      }, (notificationId) => {
-        console.log('[Notifications] Sent:', notificationId);
-        resolve(notificationId);
-      });
+      chrome.notifications.create(
+        id,
+        {
+          type: 'basic',
+          iconUrl: iconUrl || 'assets/icons/icon-128.png',
+          title,
+          message,
+          priority: 2,
+          requireInteraction: false,
+        },
+        (notificationId) => {
+          console.log('[Notifications] Sent:', notificationId);
+          resolve(notificationId);
+        }
+      );
     });
   }
 
@@ -144,10 +148,10 @@ export class NotificationManager {
    */
   handleClick(notificationId) {
     console.log('[Notifications] Clicked:', notificationId);
-    
+
     // Clear the notification
     chrome.notifications.clear(notificationId);
-    
+
     // Open popup (the notification ID contains anime info)
     // For now, just clear - could open specific anime page in future
   }
@@ -173,7 +177,7 @@ export class NotificationManager {
   hasRecentlyNotified(key) {
     const lastTime = this.lastNotified.get(key);
     if (!lastTime) return false;
-    
+
     // Don't re-notify within 30 minutes
     const thirtyMinutes = 30 * 60 * 1000;
     return Date.now() - lastTime < thirtyMinutes;
@@ -185,7 +189,7 @@ export class NotificationManager {
    */
   markNotified(key) {
     this.lastNotified.set(key, Date.now());
-    
+
     // Clean up old entries
     const oneDay = 24 * 60 * 60 * 1000;
     for (const [k, v] of this.lastNotified) {
@@ -202,24 +206,22 @@ export class NotificationManager {
    */
   formatTimeUntil(seconds) {
     if (seconds < 60) return 'weniger als 1 Minute';
-    
+
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes} Minuten`;
-    
+
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    
+
     if (hours < 24) {
-      return remainingMinutes > 0 
+      return remainingMinutes > 0
         ? `${hours}h ${remainingMinutes}m`
         : `${hours} Stunden`;
     }
-    
+
     const days = Math.floor(hours / 24);
     const remainingHours = hours % 24;
-    
-    return remainingHours > 0
-      ? `${days}d ${remainingHours}h`
-      : `${days} Tagen`;
+
+    return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days} Tagen`;
   }
 }

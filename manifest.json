@@ -21,14 +21,8 @@
     "service_worker": "background/service-worker.js",
     "type": "module"
   },
-  "permissions": [
-    "storage",
-    "alarms",
-    "notifications"
-  ],
-  "host_permissions": [
-    "https://graphql.anilist.co/*"
-  ],
+  "permissions": ["storage", "alarms", "notifications"],
+  "host_permissions": ["https://graphql.anilist.co/*"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   }

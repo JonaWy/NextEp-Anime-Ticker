@@ -85,6 +85,9 @@ export const DEFAULT_SETTINGS = {
     sortBy: 'nextEpisode',
     groupBy: 'status',
   },
+  search: {
+    filterLatestSeason: true, // Only show latest season of each anime series
+  },
   updates: {
     frequency: UPDATE_INTERVAL,
     autoUpdate: true,

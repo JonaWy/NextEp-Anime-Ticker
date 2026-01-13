@@ -25,9 +25,9 @@ export class StorageManager {
    */
   async addToWatchlist(anime) {
     const watchlist = await this.getWatchlist();
-    
+
     // Check if already exists
-    if (watchlist.some(a => a.id === anime.id)) {
+    if (watchlist.some((a) => a.id === anime.id)) {
       console.log('[Storage] Anime already in watchlist:', anime.id);
       return;
     }
@@ -52,7 +52,7 @@ export class StorageManager {
    */
   async removeFromWatchlist(id) {
     const watchlist = await this.getWatchlist();
-    const filtered = watchlist.filter(anime => anime.id !== id);
+    const filtered = watchlist.filter((anime) => anime.id !== id);
     await this.set(STORAGE_KEYS.WATCHLIST, filtered);
     console.log('[Storage] Removed from watchlist:', id);
   }
@@ -65,8 +65,8 @@ export class StorageManager {
    */
   async updateAnimeInWatchlist(id, updates) {
     const watchlist = await this.getWatchlist();
-    const index = watchlist.findIndex(anime => anime.id === id);
-    
+    const index = watchlist.findIndex((anime) => anime.id === id);
+
     if (index === -1) {
       console.warn('[Storage] Anime not found in watchlist:', id);
       return;
@@ -110,7 +110,7 @@ export class StorageManager {
    * @returns {Promise<void>}
    */
   async cacheSet(key, value, ttl) {
-    const cache = await this.get(STORAGE_KEYS.CACHE) || {};
+    const cache = (await this.get(STORAGE_KEYS.CACHE)) || {};
     cache[key] = {
       data: value,
       timestamp: Date.now(),
@@ -125,18 +125,18 @@ export class StorageManager {
    * @returns {Promise<any|null>} - Cached data or null
    */
   async cacheGet(key) {
-    const cache = await this.get(STORAGE_KEYS.CACHE) || {};
+    const cache = (await this.get(STORAGE_KEYS.CACHE)) || {};
     const entry = cache[key];
-    
+
     if (!entry) return null;
-    
+
     const now = Date.now();
     if (now - entry.timestamp > entry.ttl) {
       delete cache[key];
       await this.set(STORAGE_KEYS.CACHE, cache);
       return null;
     }
-    
+
     return entry.data;
   }
 
@@ -156,13 +156,17 @@ export class StorageManager {
   async exportWatchlist() {
     const watchlist = await this.getWatchlist();
     const settings = await this.getSettings();
-    
-    return JSON.stringify({
-      watchlist,
-      settings,
-      exportedAt: new Date().toISOString(),
-      version: '1.0.0',
-    }, null, 2);
+
+    return JSON.stringify(
+      {
+        watchlist,
+        settings,
+        exportedAt: new Date().toISOString(),
+        version: '1.0.0',
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -173,19 +177,21 @@ export class StorageManager {
   async importWatchlist(jsonString) {
     try {
       const data = JSON.parse(jsonString);
-      
+
       if (data.watchlist && Array.isArray(data.watchlist)) {
         const currentWatchlist = await this.getWatchlist();
-        const existingIds = new Set(currentWatchlist.map(a => a.id));
-        
+        const existingIds = new Set(currentWatchlist.map((a) => a.id));
+
         // Only add anime that don't already exist
-        const newAnime = data.watchlist.filter(anime => !existingIds.has(anime.id));
+        const newAnime = data.watchlist.filter(
+          (anime) => !existingIds.has(anime.id)
+        );
         const merged = [...currentWatchlist, ...newAnime];
-        
+
         await this.set(STORAGE_KEYS.WATCHLIST, merged);
         console.log('[Storage] Imported', newAnime.length, 'new anime');
       }
-      
+
       if (data.settings) {
         await this.updateSettings(data.settings);
       }
@@ -236,15 +242,19 @@ export class StorageManager {
    */
   deepMerge(target, source) {
     const result = { ...target };
-    
+
     for (const key of Object.keys(source)) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      if (
+        source[key] &&
+        typeof source[key] === 'object' &&
+        !Array.isArray(source[key])
+      ) {
         result[key] = this.deepMerge(result[key] || {}, source[key]);
       } else {
         result[key] = source[key];
       }
     }
-    
+
     return result;
   }
 }
